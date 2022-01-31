@@ -1,3 +1,6 @@
+mod genetics;
+
+
 fn main() {
-    println!("Hello, world!");
+    genetics::hello();
 }
