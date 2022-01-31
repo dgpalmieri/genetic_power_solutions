@@ -1,6 +1,7 @@
 mod genetics;
-
+use genetics::Genetics;
 
 fn main() {
-    genetics::hello();
+    let mut g : Genetics = Genetics::new("Hello, World!");
+    g.hello();
 }
