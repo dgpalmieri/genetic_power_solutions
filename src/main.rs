@@ -1,7 +1,7 @@
 mod genetics;
-use genetics::Genetics;
+use genetics::Chromosome;
 
 fn main() {
-    let mut g : Genetics = Genetics::new("Hello, World!");
-    g.hello();
+    let g: Chromosome = Chromosome::new();
+    println!("{:?}", g.get_genes());
 }

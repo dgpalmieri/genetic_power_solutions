@@ -1,14 +1,23 @@
+// genetics.rs
+//
+// A module that uses genetic algorithms to do anomaly detection on time-series data.
 
-pub struct Genetics {
-    message: String,
+use rand::Rng;
+
+pub struct Chromosome {
+    genes: Vec<i32>,
 }
 
-impl Genetics {
-    pub fn new(m: &str) -> Self {
-        let message : String = m.to_string();
-        return Self{ message };
+impl Chromosome {
+    pub fn new() -> Self {
+        let mut genes: Vec<i32> = Vec::new();
+        for _ in 0..60 {
+            genes.push(rand::thread_rng().gen_range(0..10));
+        }
+        return Self { genes };
     }
-    pub fn hello(&mut self){
-        println!("{}", self.message);
+
+    pub fn get_genes(&self) -> Vec<i32> {
+        self.genes.clone()
     }
 }
