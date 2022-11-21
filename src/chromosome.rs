@@ -20,4 +20,8 @@ impl Chromosome {
     pub fn get_genes(&self) -> Vec<i32> {
         self.genes.clone()
     }
+
+    pub fn calculate_sample_fitness(&self, file_path: &String) -> i8 {
+        0
+    }
 }
