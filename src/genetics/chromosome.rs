@@ -1,6 +1,6 @@
-// genetics.rs
+// chromosome.rs
 //
-// A module that uses genetic algorithms to do anomaly detection on time-series data.
+// Implements a chromosome for a genetic algorithms implementation
 
 use rand::Rng;
 
