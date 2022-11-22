@@ -9,4 +9,12 @@ pub struct Genetics {
     population: Vec<Chromosome>,
 }
 
-impl Genetics {}
+impl Genetics {
+    pub fn new(size: i8) -> Self {
+        let mut population: Vec<Chromosome> = Vec::new();
+        for _ in 0..size {
+            population.push(Chromosome::new());
+        }
+        Self { population }
+    }
+}
