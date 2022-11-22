@@ -17,4 +17,7 @@ impl Genetics {
         }
         Self { population }
     }
+    pub fn get_chromosomes(&self) -> Vec<Chromosome> {
+        self.population.clone()
+    }
 }
