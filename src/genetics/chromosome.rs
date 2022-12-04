@@ -30,7 +30,7 @@ impl Chromosome {
             .sqrt()
     }
 
-    pub fn calculate_sample_fitness(&mut self, data: &Vec<f32>) -> () {
+    pub fn calculate_sample_fitness(&self, data: &Vec<f32>) -> f32 {
         assert!(
             data.len() > self.genes.len(),
             "There is not enough data in the sample to use the selected number of genes"
@@ -52,6 +52,6 @@ impl Chromosome {
             "The predictor dataset was not the right length (data.len() - self.genes.len())"
         );
 
-        self.fitness = Chromosome::rmse(&data[self.genes.len()..].to_vec(), &predictor_dataset);
+        Chromosome::rmse(&data[self.genes.len()..].to_vec(), &predictor_dataset)
     }
 }
