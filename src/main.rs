@@ -1,6 +1,7 @@
 mod genetics;
 use genetics::Genetics;
 
+static POPULATION_SIZE: i8 = 60;
 static FITNESS_VALUE: i8 = 0;
 static SELECTION_RATES: (i8, i8, i8) = (0, 0, 0);
 static CROSSOVER_RATE: i8 = 0;
