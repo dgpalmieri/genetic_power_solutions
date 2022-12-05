@@ -20,8 +20,10 @@ impl Chromosome {
     pub fn new() -> Self {
         let fitness = 0.0;
 
-        let mut genes: Vec<f32> = Vec::new();
-        genes.fill(rand::thread_rng().gen());
+        let mut genes: Vec<f32> = Vec::with_capacity(10);
+        for _ in 0..genes.capacity() {
+            genes.push(rand::thread_rng().gen());
+        }
 
         return Self { genes, fitness };
     }
@@ -83,5 +85,29 @@ impl Chromosome {
             fitness_sum += Chromosome::calculate_sample_fitness(self, d);
         }
         Ok(fitness_sum / data.len() as f32)
+    }
+}
+
+#[cfg(test)]
+mod chromosome_tests {
+    use super::*;
+
+    #[test]
+    fn test_rmse() {
+        let one_a: Vec<f32> = vec![
+            34.0, 37.0, 44.0, 47.0, 48.0, 48.0, 46.0, 43.0, 32.0, 27.0, 26.0, 24.0,
+        ];
+        let one_b: Vec<f32> = vec![
+            37.0, 40.0, 46.0, 44.0, 46.0, 50.0, 45.0, 44.0, 34.0, 30.0, 22.0, 23.0,
+        ];
+        assert_eq!(Chromosome::rmse(&one_a, &one_b), 2.4324198);
+
+        let two_a: Vec<f32> = vec![15.0, 18.0, 32.0, 1.0, 11.0];
+        let two_b: Vec<f32> = vec![24.0, 16.0, 32.0, 55.0, 12.0];
+        assert_eq!(Chromosome::rmse(&two_a, &two_b), 24.503061);
+
+        let three_a: Vec<f32> = vec![1.0, 2.0, 3.0];
+        let three_b: Vec<f32> = vec![1.0, 2.0, 3.0];
+        assert_eq!(Chromosome::rmse(&three_a, &three_b), 0.0);
     }
 }
