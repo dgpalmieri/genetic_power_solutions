@@ -60,18 +60,33 @@ impl Genetics {
 
     pub fn selection(&mut self, selection_rates: (i8, i8, i8)) -> () {
         assert!(selection_rates.0 + selection_rates.1 + selection_rates.2 == 100);
-        let random_selection = selection_rates.0 / self.population.len() as i8;
+        let mut random_selection = selection_rates.0 / self.population.len() as i8;
         let tournament_selection = selection_rates.1 / self.population.len() as i8;
         let generate_new_selection = selection_rates.2 / self.population.len() as i8;
+        let mut selection_num = random_selection + tournament_selection + generate_new_selection;
 
-        let mut new_pop: Vec<Chromosome> = Vec::new();
+        if selection_num != self.population.len() as i8 {
+            if selection_num > self.population.len() as i8 {
+                random_selection -= self.population.len() as i8 - selection_num;
+            } else if selection_num < self.population.len() as i8 {
+                random_selection += self.population.len() as i8 - selection_num;
+            }
+        }
+
+        selection_num = random_selection + tournament_selection + generate_new_selection;
+        assert!(selection_num == self.population.len() as i8);
+
+        let mut new_pop: Vec<Chromosome> = Vec::with_capacity(self.population.capacity());
 
         for _ in 0..random_selection {
             let i = rand::thread_rng().gen_range(0..self.population.len());
             new_pop.push(self.population.swap_remove(i));
         }
 
-        let tourney_size = self.population.len() / 10;
+        let mut tourney_size = self.population.len() / 10;
+        if tourney_size == 0 {
+            tourney_size = 2;
+        }
         for _ in 0..tournament_selection {
             let initial_index =
                 rand::thread_rng().gen_range(0..self.population.len() - tourney_size);
@@ -96,9 +111,11 @@ impl Genetics {
         }
 
         for _ in 0..generate_new_selection {
-            let i = rand::thread_rng().gen_range(0..self.population.len());
+            let i = rand::thread_rng().gen_range(0..new_pop.len());
             new_pop.insert(i, Chromosome::new());
         }
+
+        self.population = new_pop;
     }
 
     pub fn crossover(&mut self, crossover_rate: i8) -> () {
@@ -116,11 +133,12 @@ impl Genetics {
             let starting_index_b = rand::thread_rng()
                 .gen_range(0..self.population[crossover_b].genes.len() - slice_size);
 
-            let mut swap_slice =
-                self.population[crossover_b].genes[starting_index_b..slice_size].to_vec();
-            self.population[crossover_a].genes[starting_index_a..slice_size]
+            let mut swap_slice = self.population[crossover_b].genes
+                [starting_index_b..starting_index_b + slice_size]
+                .to_vec();
+            self.population[crossover_a].genes[starting_index_a..starting_index_a + slice_size]
                 .swap_with_slice(&mut swap_slice);
-            self.population[crossover_b].genes[starting_index_b..slice_size]
+            self.population[crossover_b].genes[starting_index_b..starting_index_b + slice_size]
                 .swap_with_slice(&mut swap_slice);
         }
     }
