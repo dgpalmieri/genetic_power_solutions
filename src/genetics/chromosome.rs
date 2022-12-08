@@ -20,7 +20,7 @@ impl Chromosome {
     pub fn new() -> Self {
         let fitness = 0.0;
 
-        let mut genes: Vec<f32> = Vec::with_capacity(10);
+        let mut genes: Vec<f32> = Vec::with_capacity(60);
         for _ in 0..genes.capacity() {
             genes.push(rand::thread_rng().gen());
         }
@@ -52,7 +52,7 @@ impl Chromosome {
                 .zip(self.genes.clone())
                 .map(|(x, y)| x * y)
                 .sum();
-            predictor_dataset.push(prediction_sum / self.genes.len() as f32);
+            predictor_dataset.push(prediction_sum / self.genes.iter().sum::<f32>());
         }
 
         assert!(
