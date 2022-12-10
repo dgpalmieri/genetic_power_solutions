@@ -37,23 +37,25 @@ impl Genetics {
         }
     }
 
-    pub fn selection(&mut self, selection_rates: (i8, i8, i8)) -> () {
+    pub fn selection(&mut self, selection_rates: &(i8, i8, i8)) -> () {
         assert!(selection_rates.0 + selection_rates.1 + selection_rates.2 == 100);
-        let mut random_selection = selection_rates.0 / self.population.len() as i8;
-        let tournament_selection = selection_rates.1 / self.population.len() as i8;
-        let generate_new_selection = selection_rates.2 / self.population.len() as i8;
-        let mut selection_num = random_selection + tournament_selection + generate_new_selection;
+        let population_modifier: f32 = 1.0 / 100.0 * self.population.len() as f32;
+        let mut random_selection: i16 = (selection_rates.0 as f32 * population_modifier) as i16;
+        let tournament_selection: i16 = (selection_rates.1 as f32 * population_modifier) as i16;
+        let generate_new_selection: i16 = (selection_rates.2 as f32 * population_modifier) as i16;
+        let mut selection_num: i16 =
+            random_selection + tournament_selection + generate_new_selection;
 
-        if selection_num != self.population.len() as i8 {
-            if selection_num > self.population.len() as i8 {
-                random_selection -= self.population.len() as i8 - selection_num;
-            } else if selection_num < self.population.len() as i8 {
-                random_selection += self.population.len() as i8 - selection_num;
+        if selection_num != self.population.len() as i16 {
+            if selection_num > self.population.len() as i16 {
+                random_selection -= self.population.len() as i16 - selection_num;
+            } else if selection_num < self.population.len() as i16 {
+                random_selection += self.population.len() as i16 - selection_num;
             }
         }
 
         selection_num = random_selection + tournament_selection + generate_new_selection;
-        assert!(selection_num == self.population.len() as i8);
+        assert!(selection_num == self.population.len() as i16);
 
         let mut new_pop: Vec<Chromosome> = Vec::with_capacity(self.population.capacity());
 
@@ -97,8 +99,9 @@ impl Genetics {
         self.population = new_pop;
     }
 
-    pub fn crossover(&mut self, crossover_rate: i8) -> () {
-        for _ in 0..crossover_rate / self.population.len() as i8 {
+    pub fn crossover(&mut self, crossover_rate: &i8) -> () {
+        for _ in 0..((*crossover_rate as f32 / 100.0) * self.population.len() as f32).round() as i16
+        {
             let crossover_a = rand::thread_rng().gen_range(0..self.population.len());
             let mut crossover_b = rand::thread_rng().gen_range(0..self.population.len());
             while crossover_a == crossover_b {
@@ -122,10 +125,13 @@ impl Genetics {
         }
     }
 
-    pub fn mutation(&mut self, mutation_rate: (i8, i8)) -> () {
-        for _ in 0..mutation_rate.0 / self.population.len() as i8 {
+    pub fn mutation(&mut self, mutation_rate: &(i8, i8)) -> () {
+        for _ in 0..((mutation_rate.0 as f32 / 100.0) * self.population.len() as f32).round() as i16
+        {
             let m = rand::thread_rng().gen_range(0..self.population.len());
-            for _ in 0..mutation_rate.1 / self.population[m].genes.len() as i8 {
+            for _ in
+                0..((mutation_rate.1 as f32 / 100.0) * self.population[m].genes.len() as f32) as i8
+            {
                 let new_weight_index =
                     rand::thread_rng().gen_range(0..self.population[m].genes.len());
                 let new_weight: f32 = rand::thread_rng().gen();
