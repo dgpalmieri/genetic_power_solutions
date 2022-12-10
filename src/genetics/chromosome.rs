@@ -2,13 +2,10 @@
 //
 // Implements a chromosome for a genetic algorithms implementation
 
-use csv::Reader;
 use rand::Rng;
 
 use std::collections::HashMap;
-use std::fs::read_dir;
 use std::io::Error;
-use std::path::Path;
 
 #[derive(Clone, Debug)]
 pub struct Chromosome {
@@ -63,23 +60,10 @@ impl Chromosome {
         Chromosome::rmse(&data[self.genes.len()..].to_vec(), &predictor_dataset)
     }
 
-    pub fn calculate_dataset_fitness(&mut self, data_dir: &Path) -> Result<f32, Error> {
-        let mut data: HashMap<std::path::PathBuf, Vec<f32>> = HashMap::new();
-        for f in read_dir(data_dir)? {
-            let data_file = f?.path();
-            if data_file.exists() && !data_file.is_dir() {
-                let mut rdr = Reader::from_path(&data_file)?;
-                let mut temp_data: Vec<f32> = Vec::new();
-
-                while let Some(result) = rdr.records().next() {
-                    let record = result?;
-                    temp_data.push(record[1].parse().unwrap());
-                }
-
-                data.insert(data_file, temp_data);
-            }
-        }
-
+    pub fn calculate_dataset_fitness(
+        &mut self,
+        data: &HashMap<std::path::PathBuf, Vec<f32>>,
+    ) -> Result<f32, Error> {
         let mut fitness_sum: f32 = 0.0;
         for (_, d) in data.iter() {
             fitness_sum += Chromosome::calculate_sample_fitness(self, d);

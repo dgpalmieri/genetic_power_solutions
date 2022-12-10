@@ -4,13 +4,10 @@
 
 mod chromosome;
 use chromosome::Chromosome;
-use csv::Reader;
 use rand::Rng;
 
 use std::collections::HashMap;
-use std::fs::read_dir;
 use std::io::Error;
-use std::path::Path;
 
 #[derive(Debug)]
 pub struct Genetics {
@@ -30,32 +27,14 @@ impl Genetics {
         self.population.iter()
     }
 
-    pub fn calculate_dataset_fitness(&mut self, data_dir: &Path) -> Result<(), Error> {
-        let mut data: HashMap<std::path::PathBuf, Vec<f32>> = HashMap::new();
-        for f in read_dir(data_dir)? {
-            let data_file = f?.path();
-            if data_file.exists() && !data_file.is_dir() {
-                let mut rdr = Reader::from_path(&data_file)?;
-                let mut temp_data: Vec<f32> = Vec::new();
-
-                while let Some(result) = rdr.records().next() {
-                    let record = result?;
-                    temp_data.push(record[1].parse().unwrap());
-                }
-
-                data.insert(data_file, temp_data);
-            }
-        }
-
+    pub fn calculate_dataset_fitness(&mut self, data: &HashMap<std::path::PathBuf, Vec<f32>>) {
         for c in self.population.iter_mut() {
             let mut fitness_sum: f32 = 0.0;
             for (_, d) in data.iter() {
-                fitness_sum += c.calculate_sample_fitness(d);
+                fitness_sum += c.calculate_sample_fitness(&d);
             }
             c.fitness = fitness_sum / data.len() as f32;
         }
-
-        Ok(())
     }
 
     pub fn selection(&mut self, selection_rates: (i8, i8, i8)) -> () {
