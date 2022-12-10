@@ -63,12 +63,12 @@ impl Chromosome {
     pub fn calculate_dataset_fitness(
         &mut self,
         data: &HashMap<std::path::PathBuf, Vec<f32>>,
-    ) -> Result<f32, Error> {
+    ) -> f32 {
         let mut fitness_sum: f32 = 0.0;
         for (_, d) in data.iter() {
             fitness_sum += Chromosome::calculate_sample_fitness(self, d);
         }
-        Ok(fitness_sum / data.len() as f32)
+        fitness_sum / data.len() as f32
     }
 }
 
