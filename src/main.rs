@@ -99,12 +99,8 @@ fn main() {
 
     let fitness_values = (
         best_chromosome.fitness,
-        best_chromosome
-            .calculate_dataset_fitness(&good_testing_data)
-            .unwrap(),
-        best_chromosome
-            .calculate_dataset_fitness(&bad_testing_data)
-            .unwrap(),
+        best_chromosome.calculate_dataset_fitness(&good_testing_data),
+        best_chromosome.calculate_dataset_fitness(&bad_testing_data),
     );
 
     println!(
