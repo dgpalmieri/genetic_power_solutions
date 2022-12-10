@@ -55,7 +55,7 @@ fn main() {
 
     let mut best_chromosome_fitnesses: Vec<f32> = Vec::new();
     loop {
-        g.calculate_dataset_fitness(&data);
+        g.set_fitness_for_dataset(&data);
 
         let result: Option<usize> = g
             .iter()

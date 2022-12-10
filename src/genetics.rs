@@ -5,9 +5,7 @@
 mod chromosome;
 use chromosome::Chromosome;
 use rand::Rng;
-
 use std::collections::HashMap;
-use std::io::Error;
 
 #[derive(Debug)]
 pub struct Genetics {
@@ -27,7 +25,7 @@ impl Genetics {
         self.population.iter()
     }
 
-    pub fn calculate_dataset_fitness(&mut self, data: &HashMap<std::path::PathBuf, Vec<f32>>) {
+    pub fn set_fitness_for_dataset(&mut self, data: &HashMap<std::path::PathBuf, Vec<f32>>) -> () {
         for c in self.population.iter_mut() {
             let mut fitness_sum: f32 = 0.0;
             for (_, d) in data.iter() {
