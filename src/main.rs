@@ -46,7 +46,10 @@ fn main() {
     let mut g = Genetics::new(POPULATION_SIZE);
     let mut min_element_index: usize;
 
-    let data_path = Path::new("test");
+    let training_data_path = Path::new("training_data");
+    assert!(training_data_path.exists());
+
+    let data = read_in_data(training_data_path);
 
     let start = Instant::now();
 
@@ -82,8 +85,18 @@ fn main() {
 
     let best_chromosome = &mut g.population[min_element_index];
 
-    let good_testing_data = Path::new("test");
-    let bad_testing_data = Path::new("test");
+    println!(
+        "Best Chromosome Fitnesses:\n{:?}",
+        best_chromosome_fitnesses
+    );
+    println!("Best chromosome weights: {:?}", best_chromosome);
+
+    let good_testing_data_path = Path::new("good_testing_data");
+    let bad_testing_data_path = Path::new("bad_testing_data");
+
+    let good_testing_data = read_in_data(good_testing_data_path);
+    let bad_testing_data = read_in_data(bad_testing_data_path);
+
     let fitness_values = (
         best_chromosome.fitness,
         best_chromosome
