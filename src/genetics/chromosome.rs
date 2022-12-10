@@ -5,7 +5,6 @@
 use rand::Rng;
 
 use std::collections::HashMap;
-use std::io::Error;
 
 #[derive(Clone, Debug)]
 pub struct Chromosome {
