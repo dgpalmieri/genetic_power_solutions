@@ -2,6 +2,7 @@ mod genetics;
 
 use genetics::Genetics;
 
+use chrono::Local;
 use csv::Reader;
 use rand::Rng;
 use std::collections::HashMap;
@@ -39,8 +40,8 @@ fn main() {
     let POPULATION_SIZE: i8 = rand::thread_rng().gen_range(10..60);
     let CROSSOVER_RATE: i8 = rand::thread_rng().gen_range(5..25);
     let MUTATION_RATE: (i8, i8) = (
-        rand::thread_rng().gen_range(1..15),
         rand::thread_rng().gen_range(1..10),
+        rand::thread_rng().gen_range(1..5),
     );
 
     let mut g = Genetics::new(POPULATION_SIZE);
@@ -55,7 +56,7 @@ fn main() {
 
     let mut best_chromosome_fitnesses: Vec<f32> = Vec::new();
     loop {
-        g.set_fitness_for_dataset(&data);
+        g.set_fitness_for_dataset(&data, &false);
 
         let result: Option<usize> = g
             .iter()
@@ -85,11 +86,14 @@ fn main() {
 
     let best_chromosome = &mut g.population[min_element_index];
 
+    println!("-------------AVERAGE DATASET STATS-------------");
+    println!("Current Time: {:?}", Local::now());
+    println!("Elapsed time (in minutes): {:?}", start.elapsed() / 60);
+    println!("GA operation rounds: {}", best_chromosome_fitnesses.len());
     println!(
         "Best Chromosome Fitnesses:\n{:?}",
         best_chromosome_fitnesses
     );
-    println!("Best chromosome weights: {:?}", best_chromosome);
 
     let good_testing_data_path = Path::new("good_testing_data");
     let bad_testing_data_path = Path::new("bad_testing_data");
@@ -99,8 +103,8 @@ fn main() {
 
     let fitness_values = (
         best_chromosome.fitness,
-        best_chromosome.calculate_dataset_fitness(&good_testing_data),
-        best_chromosome.calculate_dataset_fitness(&bad_testing_data),
+        best_chromosome.calculate_dataset_fitness(&good_testing_data, &false),
+        best_chromosome.calculate_dataset_fitness(&bad_testing_data, &true),
     );
 
     println!(
