@@ -2,8 +2,9 @@
 //
 // Implements a chromosome for a genetic algorithms implementation
 
+use chrono::Local;
+use csv::Writer;
 use rand::Rng;
-
 use std::collections::HashMap;
 
 #[derive(Clone, Debug)]
@@ -34,7 +35,38 @@ impl Chromosome {
             .sqrt()
     }
 
-    pub fn calculate_sample_fitness(&self, data: &Vec<f32>) -> f32 {
+    fn generate_csv(
+        datafile_name: &str,
+        data: &Vec<f32>,
+        predictor: &Vec<f32>,
+    ) -> Result<(), csv::Error> {
+        let filename = format!(
+            "{}_prediction_data_{}.csv",
+            datafile_name[18..40].to_string(),
+            Local::now().format("%Y-%m-%dT%H:%M:%S")
+        );
+        let mut writer = Writer::from_path(filename)?;
+
+        writer.write_record(&["Actual", "Predicted", "Difference"])?;
+        for i in 0..predictor.len() {
+            writer.write_record(&[
+                format!("{}", data[i]),
+                format!("{}", predictor[i]),
+                format!("{}", data[i] - predictor[i]),
+            ])?;
+        }
+
+        writer.flush()?;
+
+        Ok(())
+    }
+
+    pub fn calculate_sample_fitness(
+        &self,
+        filename: &str,
+        data: &Vec<f32>,
+        generate_csv: &bool,
+    ) -> f32 {
         assert!(
             data.len() > self.genes.len(),
             "There is not enough data in the sample to use the selected number of genes"
@@ -53,8 +85,15 @@ impl Chromosome {
 
         assert!(
             predictor_dataset.len() == data.len() - self.genes.len(),
-            "The predictor dataset was not the right length (data.len() - self.genes.len())"
+            "The predictor dataset was not the right size (data.len() - self.genes.len())"
         );
+
+        if *generate_csv {
+            match Chromosome::generate_csv(filename, data, &predictor_dataset) {
+                Ok(x) => x,
+                Err(y) => panic!("Could not write csv! {}", y),
+            }
+        }
 
         Chromosome::rmse(&data[self.genes.len()..].to_vec(), &predictor_dataset)
     }
@@ -62,10 +101,18 @@ impl Chromosome {
     pub fn calculate_dataset_fitness(
         &mut self,
         data: &HashMap<std::path::PathBuf, Vec<f32>>,
+        generate_csv: &bool,
     ) -> f32 {
         let mut fitness_sum: f32 = 0.0;
-        for (_, d) in data.iter() {
-            fitness_sum += Chromosome::calculate_sample_fitness(self, d);
+        for (f, d) in data.iter() {
+            let sample_fitness = Chromosome::calculate_sample_fitness(
+                self,
+                f.to_str().unwrap(),
+                d,
+                generate_csv,
+            );
+            fitness_sum += sample_fitness;
+            println!("File: {}, Fitness: {}", f.to_str().unwrap(), sample_fitness);
         }
         fitness_sum / data.len() as f32
     }
